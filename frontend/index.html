@@ -1,0 +1,511 @@
+<!-- frontend/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalvin Fathers Farm Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Kalvin Fathers Farm Dashboard</h1>
+        <nav>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#crops">Crops</a></li>
+                <li><a href="#yields">Yields</a></li>
+                <li><a href="#soil">Soil Readings</a></li>
+                <li><a href="#inputs">Input Usage</a></li>
+                <li><a href="#input-costs">Input Costs</a></li>
+                <li><a href="#weather">Weather Advice</a></li>
+                <li><a href="#advice">Farm Advice</a></li>
+                <li><a href="#reports">Reports</a></li> <!-- New navigation link -->
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <div id="dashboard-grid">
+            <!-- Farm Overview Section -->
+            <section id="overview" class="dashboard-section">
+                <h2>Farm Overview & Key Metrics</h2>
+                <div class="overview-grid">
+                    <div class="card">
+                        <h3>Total Yields by Crop</h3>
+                        <div id="total-yield-chart" class="chart-container-small">
+                            <p>Loading total yield chart...</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Average Soil Parameters</h3>
+                        <div id="average-soil-chart" class="chart-container-small">
+                            <p>Loading average soil parameters chart...</p>
+                        </div>
+                    </div>
+                </div>
+                <p id="overview-message" class="message"></p>
+            </section>
+
+            <!-- New Input Cost Tracking Section -->
+            <section id="input-costs" class="dashboard-section">
+                <h2>Input Cost Tracking</h2>
+                <div id="total-input-cost-chart" class="chart-container">
+                    <p>Loading total input cost chart...</p>
+                </div>
+                <h3>Add New Input Cost Record</h3>
+                <form id="add-input-cost-form" class="data-form">
+                    <div class="form-group">
+                        <label for="costInputId">Associated Input (Optional - by ID):</label>
+                        <select id="costInputId" name="input_id">
+                            <option value="">Select an input record (Optional)</option>
+                            <!-- Options will be populated by JS -->
+                        </select>
+                        <small>Link to an existing input usage record or leave blank for general costs.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="costItemName">Item Name:</label>
+                        <input type="text" id="costItemName" name="item_name" placeholder="e.g., Urea Fertilizer, Tractor Fuel" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="costDate">Purchase Date:</label>
+                        <input type="date" id="costDate" name="cost_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="costAmount">Cost Amount:</label>
+                        <input type="number" id="costAmount" name="cost_amount" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="costCurrency">Currency:</label>
+                        <input type="text" id="costCurrency" name="currency" value="USD" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="costNotes">Notes (Optional):</label>
+                        <textarea id="costNotes" name="notes" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Add Input Cost</button>
+                    <p id="add-input-cost-message" class="message"></p>
+                </form>
+                <div id="input-costs-list" class="card-container" style="margin-top: 20px;">
+                    <p>Loading input cost records...</p>
+                </div>
+            </section>
+
+            <!-- Farm Advice Section -->
+            <section id="advice" class="dashboard-section">
+                <h2>Farm Health Advice</h2>
+                <div id="farm-advice-list" class="advice-container">
+                    <p>Loading farm advice...</p>
+                </div>
+            </section>
+
+
+            <section id="crops" class="dashboard-section">
+                <h2>Crop Management</h2>
+                <div class="card-container" id="crops-list">
+                    <p>Loading crops...</p>
+                </div>
+
+                <h3>Add New Crop</h3>
+                <form id="add-crop-form" class="data-form">
+                    <div class="form-group">
+                        <label for="cropName">Crop Name:</label>
+                        <input type="text" id="cropName" name="crop_name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="plantingSeason">Planting Season (Optional):</label>
+                        <input type="text" id="plantingSeason" name="planting_season">
+                    </div>
+                    <div class="form-group">
+                        <label for="expectedYield">Expected Yield per Acre (Optional):</label>
+                        <input type="number" id="expectedYield" name="expected_yield_per_acre" step="0.01">
+                    </div>
+                    <button type="submit" class="btn">Add Crop</button>
+                    <p id="add-crop-message" class="message"></p>
+                </form>
+            </section>
+
+            <section id="yields" class="dashboard-section">
+                <h2>Yield Trends</h2>
+                <div class="chart-container" id="yieldChartContainer">
+                    <p id="yield-chart-message" class="message"></p>
+                </div>
+
+                <!-- Yield Forecast Section -->
+                <h3>Yield Forecast (Based on Historical Average)</h3>
+                <div id="yield-forecast-list" class="card-container" style="margin-top: 20px;">
+                    <p>Loading yield forecasts...</p>
+                </div>
+                <!-- End Yield Forecast Section -->
+
+                <h3>Add New Yield Record</h3>
+                <form id="add-yield-form" class="data-form">
+                    <div class="form-group">
+                        <label for="yieldCropId">Crop:</label>
+                        <select id="yieldCropId" name="crop_id" required>
+                            <option value="">Select a crop</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="harvestDate">Harvest Date:</label>
+                        <input type="date" id="harvestDate" name="harvest_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="actualYield">Actual Yield:</label>
+                        <input type="number" id="actualYield" name="actual_yield" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="yieldUnit">Unit:</label>
+                        <input type="text" id="yieldUnit" name="unit" value="kg" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="yieldLocation">Field Location:</label>
+                        <input type="text" id="yieldLocation" name="field_location" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="yieldNotes">Notes (Optional):</label>
+                        <textarea id="yieldNotes" name="notes" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Add Yield</button>
+                    <p id="add-yield-message" class="message"></p>
+                </form>
+                <div id="yields-list" class="card-container" style="margin-top: 20px;">
+                    <p>Loading yield records...</p>
+                </div>
+            </section>
+
+            <section id="soil" class="dashboard-section">
+                <h2>Soil Monitoring</h2>
+                <h3>Add New Soil Reading</h3>
+                <form id="add-soil-form" class="data-form">
+                    <div class="form-group">
+                        <label for="soilCropId">Associated Crop (Optional):</label>
+                        <select id="soilCropId" name="crop_id">
+                            <option value="">Select a crop</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="readingDate">Reading Date:</label>
+                        <input type="date" id="readingDate" name="reading_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="soilMoisture">Moisture (%) (Optional):</label>
+                        <input type="number" id="soilMoisture" name="soil_moisture_percentage" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="phLevel">pH Level (Optional):</label>
+                        <input type="number" id="phLevel" name="ph_level" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="nitrogenLevel">Nitrogen (ppm) (Optional):</label>
+                        <input type="number" id="nitrogenLevel" name="nitrogen_level_ppm" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="phosphorusLevel">Phosphorus (ppm) (Optional):</label>
+                        <input type="number" id="phosphorusLevel" name="phosphorus_level_ppm" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="potassiumLevel">Potassium (ppm) (Optional):</label>
+                        <input type="number" id="potassiumLevel" name="potassium_level_ppm" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="soilNotes">Notes (Optional):</label>
+                        <textarea id="soilNotes" name="notes" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Add Soil Reading</button>
+                    <p id="add-soil-message" class="message"></p>
+                </form>
+                <div id="soil-readings-list" class="card-container" style="margin-top: 20px;">
+                    <p>Loading soil readings...</p>
+                </div>
+            </section>
+
+            <section id="inputs" class="dashboard-section">
+                <h2>Input Usage</h2>
+                <h3>Add New Input Record</h3>
+                <form id="add-input-form" class="data-form">
+                    <div class="form-group">
+                        <label for="inputCropId">Associated Crop (Optional):</label>
+                        <select id="inputCropId" name="crop_id">
+                            <option value="">Select a crop</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="usageDate">Usage Date:</label>
+                        <input type="date" id="usageDate" name="usage_date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputType">Input Type:</label>
+                        <input type="text" id="inputType" name="input_type" placeholder="e.g., Fertilizer, Pesticide" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputName">Input Name:</label>
+                        <input type="text" id="inputName" name="input_name" placeholder="e.g., Urea, Glyphosate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantityUsed">Quantity Used:</label>
+                        <input type="number" id="quantityUsed" name="quantity_used" step="0.01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputUnit">Unit:</label>
+                        <input type="text" id="inputUnit" name="unit" placeholder="e.g., kg, liters" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="inputLocation">Field Location (Optional):</label>
+                        <input type="text" id="inputLocation" name="field_location">
+                    </div>
+                    <div class="form-group">
+                        <label for="inputNotes">Notes (Optional):</label>
+                        <textarea id="inputNotes" name="notes" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn">Add Input Record</button>
+                    <p id="add-input-message" class="message"></p>
+                </form>
+                <div id="inputs-list" class="card-container" style="margin-top: 20px;">
+                    <p>Loading input records...</p>
+                </div>
+            </section>
+
+            <section id="weather" class="dashboard-section">
+                <h2>Weather & Climate Advice</h2>
+                <p>Get the latest weather data for the farm.</p>
+                <button id="fetchWeatherBtn" class="btn" style="margin-top: 15px;">Fetch & Store Latest Weather</button>
+                <p id="weather-message" class="message"></p>
+
+                <div id="weather-display" class="card-container" style="margin-top: 20px;">
+                    <div class="card">
+                        <h3>Current Weather</h3>
+                        <p><strong>Loading weather data...</strong></p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- New Reports Section -->
+            <section id="reports" class="dashboard-section">
+                <h2>Data Export & Reports</h2>
+                <p>Export all your farm data to CSV files for further analysis or record keeping.</p>
+                <button id="exportAllCsvBtn" class="btn" style="margin-top: 15px;"><i class="fas fa-file-csv"></i> Export All Data as CSV</button>
+                <p id="export-message" class="message"></p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+            <p>© 2025 Kalvin Fathers Farm. All rights reserved.</p>
+        </footer>
+
+    <!-- Custom Modal for Confirmations/Alerts -->
+    <div id="customModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <p id="modal-message"></p>
+            <div id="modal-buttons" class="modal-buttons">
+                <button id="modal-confirm-btn" class="btn modal-btn">Confirm</button>
+                <button id="modal-cancel-btn" class="btn modal-btn secondary-btn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit/Update Modals -->
+    <div id="editCropModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" data-modal="editCropModal">&times;</span>
+            <h2>Edit Crop</h2>
+            <form id="edit-crop-form" class="data-form">
+                <input type="hidden" id="editCropId">
+                <div class="form-group">
+                    <label for="editCropName">Crop Name:</label>
+                    <input type="text" id="editCropName" name="crop_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPlantingSeason">Planting Season (Optional):</label>
+                    <input type="text" id="editPlantingSeason" name="planting_season">
+                </div>
+                <div class="form-group">
+                    <label for="editExpectedYield">Expected Yield per Acre (Optional):</label>
+                    <input type="number" id="editExpectedYield" name="expected_yield_per_acre" step="0.01">
+                </div>
+                <button type="submit" class="btn">Update Crop</button>
+                <p id="edit-crop-message" class="message"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="editYieldModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" data-modal="editYieldModal">&times;</span>
+            <h2>Edit Yield Record</h2>
+            <form id="edit-yield-form" class="data-form">
+                <input type="hidden" id="editYieldId">
+                <div class="form-group">
+                    <label for="editYieldCropId">Crop:</label>
+                    <select id="editYieldCropId" name="crop_id" required>
+                        <option value="">Select a crop</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editHarvestDate">Harvest Date:</label>
+                    <input type="date" id="editHarvestDate" name="harvest_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="editActualYield">Actual Yield:</label>
+                    <input type="number" id="editActualYield" name="actual_yield" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="editYieldUnit">Unit:</label>
+                    <input type="text" id="editYieldUnit" name="unit" required>
+                </div>
+                <div class="form-group">
+                    <label for="editYieldLocation">Field Location:</label>
+                    <input type="text" id="editYieldLocation" name="field_location" required>
+                </div>
+                <div class="form-group">
+                    <label for="editYieldNotes">Notes (Optional):</label>
+                    <textarea id="editYieldNotes" name="notes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Update Yield</button>
+                <p id="edit-yield-message" class="message"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="editSoilModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" data-modal="editSoilModal">&times;</span>
+            <h2>Edit Soil Reading</h2>
+            <form id="edit-soil-form" class="data-form">
+                <input type="hidden" id="editSoilReadingId">
+                <div class="form-group">
+                    <label for="editSoilCropId">Associated Crop (Optional):</label>
+                    <select id="editSoilCropId" name="crop_id">
+                        <option value="">Select a crop</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editReadingDate">Reading Date:</label>
+                    <input type="date" id="editReadingDate" name="reading_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="editSoilMoisture">Moisture (%) (Optional):</label>
+                    <input type="number" id="editSoilMoisture" name="soil_moisture_percentage" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editPhLevel">pH Level (Optional):</label>
+                    <input type="number" id="editPhLevel" name="ph_level" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editNitrogenLevel">Nitrogen (ppm) (Optional):</label>
+                    <input type="number" id="editNitrogenLevel" name="nitrogen_level_ppm" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editPhosphorusLevel">Phosphorus (ppm) (Optional):</label>
+                    <input type="number" id="editPhosphorusLevel" name="phosphorus_level_ppm" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editPotassiumLevel">Potassium (ppm) (Optional):</label>
+                    <input type="number" id="editPotassiumLevel" name="potassium_level_ppm" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label for="editSoilNotes">Notes (Optional):</label>
+                    <textarea id="editSoilNotes" name="notes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Update Soil Reading</button>
+                <p id="edit-soil-message" class="message"></p>
+            </form>
+        </div>
+    </div>
+
+    <div id="editInputModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" data-modal="editInputModal">&times;</span>
+            <h2>Edit Input Record</h2>
+            <form id="edit-input-form" class="data-form">
+                <input type="hidden" id="editInputId">
+                <div class="form-group">
+                    <label for="editInputCropId">Associated Crop (Optional):</label>
+                    <select id="editInputCropId" name="crop_id">
+                        <option value="">Select a crop</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editUsageDate">Usage Date:</label>
+                    <input type="date" id="editUsageDate" name="usage_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="editInputType">Input Type:</label>
+                    <input type="text" id="editInputType" name="input_type" required>
+                </div>
+                <div class="form-group">
+                    <label for="editInputName">Input Name:</label>
+                    <input type="text" id="editInputName" name="input_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editQuantityUsed">Quantity Used:</label>
+                    <input type="number" id="editQuantityUsed" name="quantity_used" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="editInputUnit">Unit:</label>
+                    <input type="text" id="editInputUnit" name="unit" required>
+                </div>
+                <div class="form-group">
+                    <label for="editInputLocation">Field Location (Optional):</label>
+                    <input type="text" id="editInputLocation" name="field_location">
+                </div>
+                <div class="form-group">
+                    <label for="editInputNotes">Notes (Optional):</label>
+                    <textarea id="editInputNotes" name="notes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Update Input Record</button>
+                <p id="edit-input-message" class="message"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit/Update Modal for Input Costs -->
+    <div id="editInputCostModal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" data-modal="editInputCostModal">&times;</span>
+            <h2>Edit Input Cost Record</h2>
+            <form id="edit-input-cost-form" class="data-form">
+                <input type="hidden" id="editCostId">
+                <div class="form-group">
+                    <label for="editCostInputId">Associated Input (Optional - by ID):</label>
+                    <select id="editCostInputId" name="input_id">
+                        <option value="">Select an input record (Optional)</option>
+                        <!-- Options will be populated by JS -->
+                    </select>
+                    <small>Link to an existing input usage record or leave blank for general costs.</small>
+                </div>
+                <div class="form-group">
+                    <label for="editCostItemName">Item Name:</label>
+                    <input type="text" id="editCostItemName" name="item_name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCostDate">Purchase Date:</label>
+                    <input type="date" id="editCostDate" name="cost_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCostAmount">Cost Amount:</label>
+                    <input type="number" id="editCostAmount" name="cost_amount" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCostCurrency">Currency:</label>
+                    <input type="text" id="editCostCurrency" name="currency" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCostNotes">Notes (Optional):</label>
+                    <textarea id="editCostNotes" name="notes" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn">Update Input Cost</button>
+                <p id="edit-input-cost-message" class="message"></p>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js" defer></script>
+</body>
+</html>
